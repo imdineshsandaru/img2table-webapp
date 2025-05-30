@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Marks Analyzer</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <h1>Student Marks Analyzer</h1>
+        <p class="subtitle">Upload an image of a marks table for automatic analysis</p>
+      </header>
+
+      <main>
+        <section class="upload-section" id="uploadSection">
+          <div class="upload-container" id="uploadContainer">
+            <div class="upload-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <h2>Upload Image</h2>
+            <p>Drag and drop an image or click to browse</p>
+            <input type="file" id="fileInput" accept="image/*" class="file-input" />
+          </div>
+        </section>
+
+        <section class="processing-section hidden" id="processingSection">
+          <div class="processing-container">
+            <div class="loader"></div>
+            <h2>Processing Image</h2>
+            <p id="processingStatus">Performing OCR...</p>
+          </div>
+        </section>
+
+        <section class="results-section hidden" id="resultsSection">
+          <div class="results-container">
+            <div class="results-header">
+              <h2>Analysis Results</h2>
+              <div class="actions">
+                <button id="exportBtn" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Export to Excel
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 2v6h6"></path>
+                    <path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path>
+                    <path d="M21 22v-6h-6"></path>
+                    <path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path>
+                  </svg>
+                  Upload New Image
+                </button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table id="resultsTable">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Math</th>
+                    <th>Science</th>
+                    <th>English</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="error-section hidden" id="errorSection">
+          <div class="error-container">
+            <div class="error-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h2>Error Processing Image</h2>
+            <p id="errorMessage">There was a problem processing the image. Please try again with a clearer image.</p>
+            <button id="errorResetBtn" class="btn btn-primary">Try Again</button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>© 2025 Student Marks Analyzer | Uses Tesseract.js for OCR and SheetJS for Excel export</p>
+      </footer>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
