@@ -19,6 +19,7 @@ const errorMessage = document.getElementById('errorMessage');
 
 // Global state
 let processedData = null;
+let isProcessing = false;
 
 // Initialize the app
 function init() {
@@ -28,13 +29,54 @@ function init() {
 // Set up event listeners
 function setupEventListeners() {
   // File input change
-  fileInput.addEventListener('change', handleFileSelection);
+  fileInput.addEventListener('change', async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    if (file && !isProcessing) {
+      if (file.type.startsWith('image/')) {
+        await processFile(file);
+      } else {
+        showError('Please upload an image file.');
+      }
+    }
+  });
   
   // Drag and drop
-  uploadContainer.addEventListener('dragover', handleDragOver);
-  uploadContainer.addEventListener('dragleave', handleDragLeave);
-  uploadContainer.addEventListener('drop', handleDrop);
-  uploadContainer.addEventListener('click', () => fileInput.click());
+  uploadContainer.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!isProcessing) {
+      uploadContainer.classList.add('drag-over');
+    }
+  });
+  
+  uploadContainer.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    uploadContainer.classList.remove('drag-over');
+  });
+  
+  uploadContainer.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    uploadContainer.classList.remove('drag-over');
+    
+    if (!isProcessing && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        await processFile(file);
+      } else {
+        showError('Please upload an image file.');
+      }
+    }
+  });
+  
+  uploadContainer.addEventListener('click', (event) => {
+    if (!isProcessing && event.target === uploadContainer) {
+      fileInput.value = ''; // Clear the input before opening file dialog
+      fileInput.click();
+    }
+  });
   
   // Buttons
   exportBtn.addEventListener('click', handleExport);
@@ -42,48 +84,15 @@ function setupEventListeners() {
   errorResetBtn.addEventListener('click', resetApp);
 }
 
-// Handle file selection from input
-function handleFileSelection(event) {
-  const file = event.target.files[0];
-  if (file) {
-    processFile(file);
-  }
-}
-
-// Handle drag over
-function handleDragOver(event) {
-  event.preventDefault();
-  event.stopPropagation();
-  uploadContainer.classList.add('drag-over');
-}
-
-// Handle drag leave
-function handleDragLeave(event) {
-  event.preventDefault();
-  event.stopPropagation();
-  uploadContainer.classList.remove('drag-over');
-}
-
-// Handle drop
-function handleDrop(event) {
-  event.preventDefault();
-  event.stopPropagation();
-  uploadContainer.classList.remove('drag-over');
-  
-  const files = event.dataTransfer.files;
-  if (files.length > 0) {
-    const file = files[0];
-    if (file.type.startsWith('image/')) {
-      processFile(file);
-    } else {
-      showError('Please upload an image file.');
-    }
-  }
-}
-
 // Process the uploaded file
 async function processFile(file) {
+  if (isProcessing) return;
+  
   try {
+    isProcessing = true;
+    fileInput.disabled = true;
+    uploadContainer.style.pointerEvents = 'none';
+    
     // Show processing section
     showSection(processingSection);
     
@@ -112,6 +121,11 @@ async function processFile(file) {
     console.error('Error processing file:', error);
     errorMessage.textContent = error.message || 'There was an error processing the image. Please try again with a clearer image.';
     showSection(errorSection);
+  } finally {
+    isProcessing = false;
+    fileInput.disabled = false;
+    uploadContainer.style.pointerEvents = 'auto';
+    fileInput.value = ''; // Reset file input
   }
 }
 
@@ -125,7 +139,10 @@ function handleExport() {
 // Reset the app
 function resetApp() {
   fileInput.value = '';
+  fileInput.disabled = false;
+  uploadContainer.style.pointerEvents = 'auto';
   processedData = null;
+  isProcessing = false;
   showSection(uploadSection);
 }
 
@@ -147,12 +164,6 @@ function showSection(sectionToShow) {
   setTimeout(() => {
     sectionToShow.classList.remove('fade-in');
   }, 300);
-}
-
-// Show error
-function showError(message) {
-  errorMessage.textContent = message;
-  showSection(errorSection);
 }
 
 // Initialize the app when DOM is loaded
