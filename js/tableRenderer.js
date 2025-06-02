@@ -4,68 +4,34 @@
 
 /**
  * Renders the processed data as a table
- * @param {Array} data - Array of student data with totals and ranks
+ * @param {Object} data - Object containing headers and rows
  */
 export function renderResultsTable(data) {
+  const { headers, rows } = data;
   const tableBody = document.getElementById('resultsTableBody');
+  const tableHead = document.querySelector('#resultsTable thead tr');
   
   // Clear existing table content
   tableBody.innerHTML = '';
+  tableHead.innerHTML = '';
   
-  // Sort data by rank
-  const sortedData = [...data].sort((a, b) => a.rank - b.rank);
+  // Render headers
+  headers.forEach(header => {
+    const th = document.createElement('th');
+    th.textContent = header;
+    tableHead.appendChild(th);
+  });
   
   // Create table rows
-  sortedData.forEach(student => {
+  rows.forEach(rowData => {
     const row = document.createElement('tr');
     
-    // Add rank cell with appropriate styling
-    const rankCell = document.createElement('td');
-    rankCell.textContent = student.rank;
-    rankCell.style.fontWeight = 'bold';
+    headers.forEach(header => {
+      const cell = document.createElement('td');
+      cell.textContent = rowData[header];
+      row.appendChild(cell);
+    });
     
-    // Add styling based on rank
-    if (student.rank === 1) {
-      rankCell.style.color = 'var(--color-success)';
-    } else if (student.rank === 2) {
-      rankCell.style.color = 'var(--color-primary)';
-    } else if (student.rank === 3) {
-      rankCell.style.color = 'var(--color-accent)';
-    }
-    
-    row.appendChild(rankCell);
-    
-    // Add name cell
-    const nameCell = document.createElement('td');
-    nameCell.textContent = student.name;
-    row.appendChild(nameCell);
-    
-    // Add subject marks
-    const mathCell = document.createElement('td');
-    mathCell.textContent = student.math;
-    row.appendChild(mathCell);
-    
-    const scienceCell = document.createElement('td');
-    scienceCell.textContent = student.science;
-    row.appendChild(scienceCell);
-    
-    const englishCell = document.createElement('td');
-    englishCell.textContent = student.english;
-    row.appendChild(englishCell);
-    
-    // Add total marks with highlighting
-    const totalCell = document.createElement('td');
-    totalCell.textContent = student.total;
-    totalCell.style.fontWeight = 'bold';
-    
-    // Highlight total cell based on performance
-    if (student.rank === 1) {
-      totalCell.style.color = 'var(--color-success)';
-    }
-    
-    row.appendChild(totalCell);
-    
-    // Add the completed row to the table
     tableBody.appendChild(row);
   });
   
